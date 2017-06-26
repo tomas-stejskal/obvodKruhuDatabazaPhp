@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<script>
+			function send()
+			{
+				var input = document.getElementById('input').value;
+				input = Number(input);
+				
+				var data = new FormData();
+				data.append("x",input);
+				
+				
+				var xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function(){
+					if(this.readyState == 4 && this.status == 200){
+						if (this.response == 'err')
+							return;
+						var res = JSON.parse(this.response);
+						document.getElementById('obvod').innerHTML = 'o='+res.obvod;
+						document.getElementById('obsah').innerHTML = 'S='+res.obsah;
+					}
+				}
+				xhttp.open('POST','obvod.php',true);
+				xhttp.send(data);
+			}
+			
+			
+		</script>
+		<script>
+			function save()
+			{
+				var name = document.getElementById('in_name').value;
+				var age = document.getElementById('in_age').value;
+				if (name == "" || age == "")
+					return;
+				age = Number(age);
+				var dat = {
+					name: name,
+					age: age
+				};
+				dat = JSON.stringify(dat);
+				
+				var data = new FormData();
+				data.append("x",dat);
+				
+				var xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function(){
+					if(this.readyState == 4 && this.status == 200){
+						
+					}
+				}
+				xhttp.open('POST','write_to_db.php',true);
+				xhttp.send(data);
+				document.getElementById('in_name').value = "";
+				document.getElementById('in_age').value = "";
+			}
+		</script>
+		<script>
+		function get_data()
+		{
+			var search = document.getElementById('search').value;
+			
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function(){
+				if(this.readyState == 4 && this.status == 200){
+					var data = this.response;
+					data = JSON.parse(data);
+					//doc build
+					var doc = document.getElementById('out_table');
+					doc.innerHTML = "";
+					var tabulka = document.createElement('table');
+					tabulka.setAttribute('style','margin: 0 auto;');
+					var tr1 = document.createElement('tr');
+					
+					var td1 = document.createElement('td');
+					td1.innerHTML = "ID";
+					var td2 = document.createElement('td');
+					td2.innerHTML = "name";
+					var td3 = document.createElement('td');
+					td3.innerHTML = "age";
+					
+					tr1.appendChild(td1);
+					tr1.appendChild(td2);
+					tr1.appendChild(td3);
+					tabulka.appendChild(tr1);
+					
+					for (var i =0;i<data.length;i++){
+						var tr1 = document.createElement('tr');
+						
+						var td1 = document.createElement('td');
+						td1.innerHTML = data[i].id;
+						var td2 = document.createElement('td');
+						td2.innerHTML = data[i].name;
+						var td3 = document.createElement('td');
+						td3.innerHTML = data[i].age;
+						
+						tr1.appendChild(td1);
+						tr1.appendChild(td2);
+						tr1.appendChild(td3);
+						tabulka.appendChild(tr1);
+						
+					}
+					
+					doc.appendChild(tabulka);
+				}
+			}
+			xhttp.open('GET','get_from_db.php?x='+search,true);
+			xhttp.send();
+		}
+		</script>
+		<style>
+			table {
+				border-collapse: collapse;
+			}
+			td,tr,table{
+				border: 1px solid black;
+			}
+			.btn {
+				border-radius: 50%;
+				border: none;
+				background-color: #3399ff;
+				padding: 7px 20px;
+				cursor: pointer;
+			}
+			html{
+				background-color: #b3d9ff;
+			}
+			.core{
+				margin: 0 auto;
+				text-align: center;
+				margin-top: 100px;
+			}
+			input[type=text] {
+				border-radius: 12px;
+				border: 2px solid #3399ff;
+				
+			}
+			input[type=number] {
+				border-radius: 12px;
+				border-color: #3399ff;
+				border: 2px solid #3399ff;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="core">
+			<span>R=</span>
+			<input value="0" type="number" id="input" step="any"/>
+			<input type="button" value="submit" onclick="send()" class="btn"/>
+			<div id="obvod"></div>
+			<div id="obsah"></div>
+			<div></div>
+			
+			<table style="margin: 0 auto;">
+				<tr>
+					<td>meno</td> <td>vek</td>  <td></td>  
+				</tr>
+				<tr>
+					<td><input type="text" id="in_name"/></td> <td><input type="number" id="in_age"/></td> <td><input type="button" value="submit" onclick="save()"  class="btn" /></td> 
+				</tr>
+			</table>
+			<input type="text" id="search">
+			<input type="button" value="get data" onclick="get_data()" class="btn" />
+			<div id="out_table" style="margin: 0 auto;">
+			</div>
+		</div>
+		
+	</body>
+</html>
